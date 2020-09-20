@@ -33,6 +33,22 @@ const userSchema = mongoose.Schema(
   }
 );
 
+// Method to fill users with favorites photos
+const autoPopulate = function (next) {
+  this.populate([
+    {
+      path: 'favorites'
+    }
+  ]);
+  next();
+};
+
+userSchema
+  .pre('find', autoPopulate)
+  .pre('findOne', autoPopulate)
+  .pre('findOneAndUpdate', autoPopulate)
+  .pre('update', autoPopulate);
+
 // Replace _id to id, and delete hashedPassword, salt and __v in responses
 userSchema.set('toJSON', {
   virtuals: true,
