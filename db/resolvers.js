@@ -11,10 +11,7 @@ const resolvers = {
       return ctx.user;
     },
     // Photos
-    getPhotos: async (_, {}, ctx) => {
-      if (!ctx.user) {
-        throw new Error('Invalid token. Please sign in.');
-      }
+    getPhotos: async () => {
       try {
         const photos = await Photo.find();
         if (!photos) {
@@ -26,10 +23,7 @@ const resolvers = {
         return new Error('An unexpected error happened.');
       }
     },
-    getPhotosByCategory: async (_, { id }, ctx) => {
-      if (!ctx.user) {
-        throw new Error('Invalid token. Please sign in.');
-      }
+    getPhotosByCategory: async (_, { id }) => {
       try {
         const photos = await Photo.find({ category: id });
         if (!photos) {
@@ -41,10 +35,7 @@ const resolvers = {
         return new Error('An unexpected error happened.');
       }
     },
-    getPhoto: async (_, { id }, ctx) => {
-      if (!ctx.user) {
-        throw new Error('Invalid token. Please sign in.');
-      }
+    getPhoto: async (_, { id }) => {
       try {
         const photo = await Photo.findOne({ _id: id });
         if (!photo) {
@@ -57,10 +48,7 @@ const resolvers = {
       }
     },
     // Categories
-    getCategories: async (_, {}, ctx) => {
-      if (!ctx.user) {
-        throw new Error('Invalid token. Please sign in.');
-      }
+    getCategories: async () => {
       try {
         const categories = await Category.find();
         if (!categories) {

@@ -15,6 +15,27 @@ const {
 // isAuth
 const isAuth = require('../utils/isAuth');
 
+// Get auth user
+router.post('/', async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(200).json({});
+  }
+  const { sub: id, name, email } = jwt.verify(token, config.jwtSecret);
+  if (!id || !name || !email) {
+    return res.status(401).json({
+      error: 'Invalid token.'
+    });
+  }
+  res.status(200).json({
+    user: {
+      id,
+      name,
+      email
+    }
+  });
+});
+
 // Sign in route
 router.post('/signin', userSignInValidator, runValidation, async (req, res) => {
   const { email, password } = req.body;
