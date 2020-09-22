@@ -1,8 +1,6 @@
 const User = require('../models/User');
 const Photo = require('../models/Photo');
 const Category = require('../models/Category');
-const jwt = require('jsonwebtoken');
-const config = require('../config/env');
 
 const resolvers = {
   Query: {
@@ -91,18 +89,16 @@ const resolvers = {
         throw new Error('Invalid token. Please sign in.');
       }
       try {
-        const user = await User.findOneAndUpdate(
-          { _id: ctx.user.id, favorites: { $ne: id } },
-          {
-            $addToSet: {
-              favorites: id
-            }
-          },
-          { new: true }
-        );
+        let user = await User.findOne({ _id: ctx.user.id });
         if (!user) {
-          return new Error('User not found or liked already.');
+          return new Error('User not found');
         }
+        if (user.favorites.find((favorite) => favorite.id === id)) {
+          return new Error('Photo already liked by user');
+        }
+        user.favorites.push(id);
+        await user.save();
+
         const photo = await Photo.findOneAndUpdate(
           { _id: id },
           {
@@ -125,18 +121,18 @@ const resolvers = {
         throw new Error('Invalid token. Please sign in.');
       }
       try {
-        const user = await User.findOneAndUpdate(
-          { _id: ctx.user.id, favorites: id },
-          {
-            $pull: {
-              favorites: id
-            }
-          },
-          { new: true }
-        );
+        const user = await User.findOne({ _id: ctx.user.id });
         if (!user) {
-          return new Error('User not found or photo not liked yet.');
+          return new Error('User not found');
         }
+        if (!user.favorites.find((favorite) => favorite.id === id)) {
+          return new Error('Photo is not liked yet.');
+        }
+        user.favorites = user.favorites.filter(
+          (favorite) => favorite.id !== id
+        );
+        await user.save();
+
         const photo = await Photo.findOneAndUpdate(
           { _id: id },
           {

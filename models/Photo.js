@@ -29,10 +29,10 @@ const photoSchema = mongoose.Schema(
 const autoPopulate = function (next) {
   this.populate([
     {
-      path: 'user'
+      path: 'category'
     },
     {
-      path: 'category'
+      path: 'user'
     }
   ]);
   next();
