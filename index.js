@@ -57,7 +57,7 @@ const server = new ApolloServer({
   }
 });
 
-server.applyMiddleware({ app });
+server.applyMiddleware({ app, cors: false });
 
 // Auth routes
 app.use('/auth', authRoutes);

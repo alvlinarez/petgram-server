@@ -27,13 +27,26 @@ router.post('/', async (req, res) => {
       error: 'Invalid token.'
     });
   }
-  res.status(200).json({
-    user: {
-      id,
-      name,
-      email
+  try {
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(401).json({
+        error: 'User not found'
+      });
     }
-  });
+    return res.status(200).json({
+      user: {
+        id,
+        name,
+        email,
+        favorites: user.favorites
+      }
+    });
+  } catch (e) {
+    return res.status(500).json({
+      error: 'An unexpected error happened'
+    });
+  }
 });
 
 // Sign in route
@@ -57,7 +70,7 @@ router.post('/signin', userSignInValidator, runValidation, async (req, res) => {
       });
     }
     user = user.toJSON();
-    const { id, name } = user;
+    const { id, name, favorites } = user;
     const payload = {
       sub: id,
       name,
@@ -74,7 +87,8 @@ router.post('/signin', userSignInValidator, runValidation, async (req, res) => {
       user: {
         id,
         name,
-        email
+        email,
+        favorites
       }
     });
   } catch (e) {

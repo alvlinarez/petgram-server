@@ -6,7 +6,16 @@ const resolvers = {
   Query: {
     // User
     getUser: async (_, {}, ctx) => {
-      return ctx.user;
+      try {
+        const user = await User.findOne({ _id: ctx.user.id });
+        if (!user) {
+          return new Error('User not found.');
+        }
+        return user;
+      } catch (e) {
+        console.log(e);
+        return new Error('An unexpected error happened.');
+      }
     },
     // Photos
     getPhotos: async () => {
