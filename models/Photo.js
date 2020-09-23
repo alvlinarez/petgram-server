@@ -15,6 +15,12 @@ const photoSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     },
+    usersLiked: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
     likes: {
       type: Number,
       default: 0
@@ -33,6 +39,9 @@ const autoPopulate = function (next) {
     },
     {
       path: 'user'
+    },
+    {
+      path: 'usersLiked'
     }
   ]);
   next();

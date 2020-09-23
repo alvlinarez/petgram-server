@@ -16,7 +16,7 @@ const {
 const isAuth = require('../utils/isAuth');
 
 // Get auth user
-router.post('/', async (req, res) => {
+router.post('/', (req, res) => {
   const { token } = req.body;
   if (!token) {
     return res.status(200).json({});
@@ -27,26 +27,13 @@ router.post('/', async (req, res) => {
       error: 'Invalid token.'
     });
   }
-  try {
-    const user = await User.findOne({ _id: id });
-    if (!user) {
-      return res.status(401).json({
-        error: 'User not found'
-      });
+  return res.status(200).json({
+    user: {
+      id,
+      name,
+      email
     }
-    return res.status(200).json({
-      user: {
-        id,
-        name,
-        email,
-        favorites: user.favorites
-      }
-    });
-  } catch (e) {
-    return res.status(500).json({
-      error: 'An unexpected error happened'
-    });
-  }
+  });
 });
 
 // Sign in route
@@ -70,7 +57,7 @@ router.post('/signin', userSignInValidator, runValidation, async (req, res) => {
       });
     }
     user = user.toJSON();
-    const { id, name, favorites } = user;
+    const { id, name } = user;
     const payload = {
       sub: id,
       name,
@@ -87,8 +74,7 @@ router.post('/signin', userSignInValidator, runValidation, async (req, res) => {
       user: {
         id,
         name,
-        email,
-        favorites
+        email
       }
     });
   } catch (e) {
@@ -183,7 +169,7 @@ router.post('/signup', userSignUpValidator, runValidation, async (req, res) => {
         error: 'Email already exists.'
       });
     }
-    user = new User({ name, email, password, favorites: [] });
+    user = new User({ name, email, password });
     try {
       await user.save();
       return res.status(200).json({

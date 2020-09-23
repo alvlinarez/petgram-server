@@ -85,7 +85,8 @@ const resolvers = {
         let photo = new Photo({
           category: categoryId,
           user: ctx.user.id,
-          src
+          src,
+          usersLiked: []
         });
         photo = await photo.save();
         return photo.toJSON();
@@ -98,19 +99,12 @@ const resolvers = {
         throw new Error('Invalid token. Please sign in.');
       }
       try {
-        let user = await User.findOne({ _id: ctx.user.id });
-        if (!user) {
-          return new Error('User not found');
-        }
-        if (user.favorites.find((favorite) => favorite.id === id)) {
-          return new Error('Photo already liked by user');
-        }
-        user.favorites.push(id);
-        await user.save();
-
         const photo = await Photo.findOneAndUpdate(
-          { _id: id },
+          { _id: id, usersLiked: { $ne: ctx.user.id } },
           {
+            $addToSet: {
+              usersLiked: ctx.user.id
+            },
             $inc: {
               likes: 1
             }
@@ -118,7 +112,7 @@ const resolvers = {
           { new: true }
         );
         if (!photo) {
-          return new Error('Photo not found.');
+          return new Error('Photo not found or already liked.');
         }
         return photo;
       } catch (e) {
@@ -130,21 +124,12 @@ const resolvers = {
         throw new Error('Invalid token. Please sign in.');
       }
       try {
-        const user = await User.findOne({ _id: ctx.user.id });
-        if (!user) {
-          return new Error('User not found');
-        }
-        if (!user.favorites.find((favorite) => favorite.id === id)) {
-          return new Error('Photo is not liked yet.');
-        }
-        user.favorites = user.favorites.filter(
-          (favorite) => favorite.id !== id
-        );
-        await user.save();
-
         const photo = await Photo.findOneAndUpdate(
-          { _id: id },
+          { _id: id, usersLiked: ctx.user.id },
           {
+            $pull: {
+              usersLiked: ctx.user.id
+            },
             $inc: {
               likes: -1
             }
@@ -152,7 +137,7 @@ const resolvers = {
           { new: true }
         );
         if (!photo) {
-          return new Error('Photo not found.');
+          return new Error('Photo not found or not liked yet.');
         }
         return photo;
       } catch (e) {

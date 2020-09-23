@@ -5,7 +5,6 @@ const typeDefs = gql`
     id: ID
     name: String
     email: String
-    favorites: [Photo]
     createdAt: String
   }
   type Photo {
@@ -14,6 +13,7 @@ const typeDefs = gql`
     src: String
     user: User
     likes: Int
+    usersLiked: [User]
   }
   type Category {
     id: ID
