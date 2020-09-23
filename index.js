@@ -25,7 +25,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(
   cors({
-    origin: ['http://localhost:3000'],
+    origin: [config.clientUrl],
     credentials: true
   })
 );
@@ -46,14 +46,6 @@ const server = new ApolloServer({
       }
       return { user: { id, name, email } };
     }
-    // Prod
-    // try {
-    //   return ({ id, email, name } = jwt.verify(token, config.jwtSecret));
-    // } catch (e) {
-    //   throw new AuthenticationError(
-    //     'Authentication token is invalid, please log in'
-    //   );
-    // }
   }
 });
 

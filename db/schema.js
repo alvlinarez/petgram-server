@@ -40,6 +40,7 @@ const typeDefs = gql`
     getPhotos: [Photo]
     getPhotosByCategory(id: ID!): [Photo]
     getPhoto(id: ID!): Photo
+    getLikedPhotos: [Photo]
     # Categories
     getCategories: [Category]
   }

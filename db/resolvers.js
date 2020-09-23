@@ -54,6 +54,21 @@ const resolvers = {
         return new Error('An unexpected error happened.');
       }
     },
+    getLikedPhotos: async (_, {}, ctx) => {
+      if (!ctx.user) {
+        throw new Error('Invalid token. Please sign in.');
+      }
+      try {
+        const photos = await Photo.find({ usersLiked: ctx.user.id });
+        if (!photos) {
+          return new Error('Liked photos not found.');
+        }
+        return photos;
+      } catch (e) {
+        console.log(e);
+        return new Error('An unexpected error happened.');
+      }
+    },
     // Categories
     getCategories: async () => {
       try {
